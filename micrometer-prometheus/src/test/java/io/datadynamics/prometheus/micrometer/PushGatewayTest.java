@@ -17,11 +17,10 @@ public class PushGatewayTest {
     private static Gauge dataProcessedInBytes = Gauge.build()
             .name("data_processed")
             .help("data processed in the last batch job run")
-            .unit(Unit.RATIO)
+            .unit("bytes") // Connection Pool Size는 count 사용 가능 (Optional)
             .register();
 
     public static void main(String[] args) throws IOException {
-        System.out.println(Unit.BYTES.toString());
         try {
             long bytesProcessed = processData();
             dataProcessedInBytes.set(bytesProcessed);
