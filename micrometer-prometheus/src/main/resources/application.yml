@@ -45,13 +45,36 @@ springdoc:
     - /api/v1/**
 
 #############################
+# Application Configuration
+#############################
+
+app:
+
+#############################
+# Logging Configuration
+#############################
+
+logging:
+  config: classpath:/logback.xml
+
+#############################
 # Management Configuration
 #############################
 
 management:
+  server:
+    port: 9000
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   endpoints:
-    prometheus:
-      enabled: true
     web:
       exposure:
-        include: prometheus, openapi, swagger-ui
+        include: prometheus, metrics, info, health, shutdown, beans

@@ -17,6 +17,7 @@
         <!-- Spring Framework -->
         <spring.boot.version>3.4.1</spring.boot.version>
         <openapi.version>2.7.0</openapi.version>
+        <micrometer.version>1.14.2</micrometer.version>
     </properties>
 
     <build>
@@ -102,6 +103,16 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+
         <!-- ================== -->
         <!--  Test Dependencies -->
         <!-- ================== -->
@@ -120,6 +131,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>${micrometer.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
