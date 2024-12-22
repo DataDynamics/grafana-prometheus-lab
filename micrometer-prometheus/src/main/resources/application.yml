@@ -49,6 +49,10 @@ springdoc:
 #############################
 
 app:
+  prometheus:
+    job-name: spring
+    grouping-key: ${spring.application.name}
+    pushgateway-url: localhost:9091
 
 #############################
 # Logging Configuration

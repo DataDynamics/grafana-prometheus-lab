@@ -2,7 +2,8 @@
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss}  [%logger{100}.%M\(%line\)] - %msg%n</pattern>
+            <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss} [%logger{100}.%M\(%line\)] - %msg%n
+            </pattern>
             <!--
             <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss} %green([%thread]) [%logger{50}.%M\(%line\)] - %msg%n</pattern>
             -->
@@ -12,7 +13,8 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
-            <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss} [%logger{100}.%M\(%line\)] - %msg%n</pattern>
+            <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss} [%logger{100}.%M\(%line\)] - %msg%n
+            </pattern>
             <!--
             <pattern>%highlight([%-5level]) %X{PID:-} %d{yyyy-MM-dd HH:mm:ss} %green([%thread]) [%logger{50}.%M\(%line\)] - %msg%n</pattern>
             -->

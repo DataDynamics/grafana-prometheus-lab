@@ -60,4 +60,26 @@ Prometheus Client API에서 `io.prometheus.metrics.model.snapshots.Unit`을 참�
   * `prometheus_tsdb_head_truncations_total`
 * 같은 Metric이지만 다른 특징을 갖는 경우 label 사용
   * `api_http_requests_total` - differentiate request types: `operation="create|update|delete"`
-  * `api_request_duration_seconds` - differentiate request stages: `stage="extract|transform|load"` 
+  * `api_request_duration_seconds` - differentiate request stages: `stage="extract|transform|load"`
+
+## Java PushGateway
+
+```java
+CollectorRegistry registry = new CollectorRegistry();
+Gauge duration = Gauge.build()
+        .name("my_batch_job_duration_seconds").help("Duration of my batch job in seconds.").register(registry);
+Gauge.Timer durationTimer = duration.startTimer();
+try {
+    // Your code here.
+
+    // This is only added to the registry after success,
+    // so that a previous success in the Pushgateway isn't overwritten on failure.
+    Gauge lastSuccess = Gauge.build()
+            .name("my_batch_job_last_success").help("Last time my batch job succeeded, in unixtime.").register(registry);
+    lastSuccess.setToCurrentTime();
+} finally {
+    durationTimer.setDuration();
+    PushGateway pg = new PushGateway(new URL("https://cn-hangzhou.arms.aliyuncs.com/prometheus/52b12ea9cf4bb9e35****/16727530178****/1df8lj***/cn-hangzhou/api/v2"));
+    pg.pushAdd(registry, "my_batch_job");
+}
+```

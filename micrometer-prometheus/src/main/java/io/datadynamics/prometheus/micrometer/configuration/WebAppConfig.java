@@ -36,6 +36,12 @@ public class WebAppConfig implements WebMvcConfigurer {
                 .addTransformer(new IndexPageTransformer());
     }
 
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // /로 접속하면 Swagger Open API 페이지가 표시되도록 리다이렉트 규칙 추가
+        registry.addRedirectViewController("/", "/swagger-ui/index.html");
+    }
+
     public static class IndexPageTransformer implements ResourceTransformer {
 
         private String overwriteDefaultUrl(String html) {
@@ -52,12 +58,6 @@ public class WebAppConfig implements WebMvcConfigurer {
                 return resource;
             }
         }
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        // /로 접속하면 Swagger Open API 페이지가 표시되도록 리다이렉트 규칙 추가
-        registry.addRedirectViewController("/", "/swagger-ui/index.html");
     }
 
 }
