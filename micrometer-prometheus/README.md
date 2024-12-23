@@ -84,6 +84,22 @@ try {
 }
 ```
 
+## Alarm (Alert)
+
+https://blog.omoknooni.me/115
+
+Prometheus의 alarm는 다음 두 가지로 구성됩니다.
+
+* Alerting Rule - Prometheus가 수집한 metric에 대해서 alert 규칙을 yaml 파일로 정의
+* Alert Manager - 생성된 알람을 외부 서비스로 전달 (예; Email)
+
+Alarm은 다음의 세 가지 상태가 있습니다.
+
+* INACTIVE - 알람 조건에 맞는 것이 없음
+* PENDING - 알람 조건에는 맞으나 기간에 충족하지는 않음
+* FIRING - 알람 조건에 맞으며 기간도 충족하는 상태
+
+
 ## 참고
 
 * https://www.baeldung.com/spring-quartz-schedule
