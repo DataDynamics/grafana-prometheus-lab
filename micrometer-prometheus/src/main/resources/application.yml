@@ -91,4 +91,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus, metrics, info, health, shutdown, beans
+        include: "*"
+        #include: prometheus, metrics, info, health, shutdown, beans
