@@ -83,3 +83,7 @@ try {
     pg.pushAdd(registry, "my_batch_job");
 }
 ```
+
+## 참고
+
+* https://www.baeldung.com/spring-quartz-schedule
