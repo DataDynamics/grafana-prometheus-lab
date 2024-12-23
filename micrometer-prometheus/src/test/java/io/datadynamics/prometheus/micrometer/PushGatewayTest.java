@@ -11,11 +11,11 @@ import java.net.URL;
 
 public class PushGatewayTest {
 
-
     public static void main(String[] args) throws IOException {
         // Push Gateway 생성
         PushGateway pushGateway = PushGateway.builder()
                 .address("localhost:9091")  // Push Gateway의 주소 (기본값: localhost:9091)
+                .groupingKey("instance", "instance1.dd.io")
                 .groupingKey("a", "b") // a="b"
                 .groupingKey("c", "e") // c="e"
                 .connectionFactory(new HttpConnectionFactory() {

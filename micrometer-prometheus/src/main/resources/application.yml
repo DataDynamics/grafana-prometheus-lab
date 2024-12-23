@@ -25,6 +25,16 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
+  ################################
+  # Quartz Auto Configuration
+  ################################
+
+  quartz:
+    auto-startup: true
+    job-store-type: memory
+    jdbc:
+      initialize-schema: always   # change this value
+
 ##################################
 # SpringDoc OpenAPI Configuration
 ##################################
