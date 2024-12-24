@@ -1,8 +1,8 @@
 package io.datadynamics.prometheus.micrometer;
 
+import io.datadynamics.prometheus.micrometer.prometheus.PushGateway;
 import io.prometheus.metrics.core.metrics.Gauge;
 import io.prometheus.metrics.exporter.pushgateway.HttpConnectionFactory;
-import io.prometheus.metrics.exporter.pushgateway.PushGateway;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
