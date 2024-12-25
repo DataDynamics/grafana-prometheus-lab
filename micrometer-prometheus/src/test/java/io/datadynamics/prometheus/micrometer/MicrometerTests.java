@@ -33,7 +33,8 @@ public class MicrometerTests {
 //        prometheusMeterRegistry();
 //        counter();
 //        gauge();
-        timer();
+//        timer();
+        distributionSummary();
     }
 
     /////////////////////////////////////////////////
@@ -218,6 +219,32 @@ public class MicrometerTests {
         }
 
         System.out.println(registry.getMetersAsString());
+    }
+
+    public static void distributionSummary() {
+        PrometheusMeterRegistry registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+        DistributionSummary summary = DistributionSummary
+                .builder("response.size")
+                .description("a description of what this summary does")
+                .baseUnit("bytes")
+                .tags("instance", "api.datalake.net")
+                .serviceLevelObjectives(80) // 80 보다 작은 것의 개수가 Gauge로 제공
+                .maximumExpectedValue(100d)
+                .register(registry);
+
+        summary.record(20); // 1
+        summary.record(77); // 2
+        summary.record(32); // 3
+        summary.record(55); // 4
+        summary.record(88);
+        summary.record(91);
+        summary.record(81);
+        summary.record(43); // 5
+        summary.record(100);
+
+        System.out.println(summary.takeSnapshot().toString());
+        System.out.println(registry.scrape());
     }
 
     public static void sleep() {
