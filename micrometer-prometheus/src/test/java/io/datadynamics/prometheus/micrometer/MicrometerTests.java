@@ -7,6 +7,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import org.apache.commons.lang3.RandomUtils;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,12 +27,13 @@ public class MicrometerTests {
     TimeGauge timeGauge;
 
     public static void main(String[] args) {
-        simpleRegistry();
-        compositeRegistry();
-        globalRegistry();
-        prometheusMeterRegistry();
-        counter();
-        gauge();
+//        simpleRegistry();
+//        compositeRegistry();
+//        globalRegistry();
+//        prometheusMeterRegistry();
+//        counter();
+//        gauge();
+        timer();
     }
 
     /////////////////////////////////////////////////
@@ -196,6 +198,35 @@ public class MicrometerTests {
         System.out.println("Gauge : " + gauge.value()); // 81.0
         System.out.println("Gauge : " + gauge.value()); // 81.0
         System.out.println("Gauge : " + gauge.value()); // 49.0
+    }
+
+    public static void timer() {
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+
+        Timer timer = Timer.builder("http.rest.api.request.time")
+                .description("HTTP REST API Request Time")
+                .maximumExpectedValue(Duration.ofMinutes(10))
+                .minimumExpectedValue(Duration.ofSeconds(1))
+                .sla(Duration.ofMinutes(10))
+                .tags("instance", "api.datalake.net")
+                .register(registry);
+
+        for (int i = 0; i < 3; i++) {
+            Timer.Sample sample = Timer.start(registry);
+            sleep();
+            sample.stop(timer);
+        }
+
+        System.out.println(registry.getMetersAsString());
+    }
+
+    public static void sleep() {
+        try {
+            int millis = RandomUtils.insecure().nextInt(500, 2000);
+            System.out.println("Sleep : " + millis + "ms");
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+        }
     }
 
     static class MyClass {
