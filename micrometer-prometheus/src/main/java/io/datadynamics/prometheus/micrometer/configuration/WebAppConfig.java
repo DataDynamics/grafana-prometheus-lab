@@ -45,7 +45,7 @@ public class WebAppConfig implements WebMvcConfigurer {
     public static class IndexPageTransformer implements ResourceTransformer {
 
         private String overwriteDefaultUrl(String html) {
-            return html.replace("https://petstore.swagger.io/v2/swagger.json", "/api/v1/api-docs");
+            return html.replace("https://petstore.swagger.io/v2/swagger.json", "/api/api-docs");
         }
 
         @Override

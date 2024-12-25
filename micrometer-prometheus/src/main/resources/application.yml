@@ -41,8 +41,6 @@ spring:
 
 springdoc:
   version: '@project.version@'
-  api-docs:
-    path: /api/v1/api-docs
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   swagger-ui:
@@ -53,6 +51,8 @@ springdoc:
     display-query-params-without-oauth2: true
   paths-to-match:
     - /api/**
+  api-docs:
+    path: /api/api-docs
 
 #############################
 # Application Configuration
@@ -92,4 +92,4 @@ management:
     web:
       exposure:
         include: "*"
-        #include: prometheus, metrics, info, health, shutdown, beans
+#        include: prometheus, metrics, info, health, shutdown, beans
