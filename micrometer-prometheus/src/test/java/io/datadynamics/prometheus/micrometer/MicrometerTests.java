@@ -26,10 +26,12 @@ public class MicrometerTests {
     TimeGauge timeGauge;
 
     public static void main(String[] args) {
-        // simpleRegistry();
-        // compositeRegistry();
-        // globalRegistry();
+        simpleRegistry();
+        compositeRegistry();
+        globalRegistry();
         prometheusMeterRegistry();
+        counter();
+        gauge();
     }
 
     /////////////////////////////////////////////////
@@ -163,9 +165,42 @@ public class MicrometerTests {
         System.out.println(registry.scrape());
     }
 
+    public static void counter() {
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+
+        Counter counter = Counter.builder("http.rest.api")
+                .baseUnit("requests")
+                .description("HTTP Request Total Count")
+                .tags("instance", "api.datalake.net", "uri", "/api/v1/user")
+                .register(registry);
+
+        System.out.println(counter.getClass().getName()); // CumulativeCounter
+
+        counter.increment(1.1);
+        counter.increment(0.5);
+        counter.increment(-1.0); // 사용은 가능하나 결과값은 오류 발생
+
+        System.out.println("Counter : " + counter.count()); // = 0.6000000000000001
+    }
+
+    public static void gauge() {
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+        MyClass myObj = new MyClass();
+
+        Gauge gauge = Gauge.builder("http.rest.api", myObj, myObj::getGaugeValue)
+                .baseUnit("active")
+                .description("Active Thread Count for HTTP REST API")
+                .tags("instance", "api.datalake.net")
+                .register(registry);
+
+        System.out.println("Gauge : " + gauge.value()); // 81.0
+        System.out.println("Gauge : " + gauge.value()); // 81.0
+        System.out.println("Gauge : " + gauge.value()); // 49.0
+    }
+
     static class MyClass {
         public double getGaugeValue(MyClass myClass) {
-            return RandomUtils.insecure().randomDouble(1, 100);
+            return RandomUtils.insecure().randomInt(1, 100);
         }
     }
 
