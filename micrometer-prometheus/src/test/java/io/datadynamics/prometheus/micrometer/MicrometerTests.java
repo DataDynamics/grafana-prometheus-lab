@@ -3,8 +3,11 @@ package io.datadynamics.prometheus.micrometer;
 import io.micrometer.core.instrument.*;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import org.apache.commons.lang3.RandomUtils;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MicrometerTests {
@@ -23,8 +26,10 @@ public class MicrometerTests {
     TimeGauge timeGauge;
 
     public static void main(String[] args) {
-        simpleRegistry();
-        compositeRegistry();
+        // simpleRegistry();
+        // compositeRegistry();
+        // globalRegistry();
+        prometheusMeterRegistry();
     }
 
     /////////////////////////////////////////////////
@@ -60,10 +65,10 @@ public class MicrometerTests {
 
     public static void simpleRegistry() {
         // In-Memory Simple Meter Registry
-        MeterRegistry registry = new SimpleMeterRegistry();
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
 
         // Type 1 Counter
-        Counter counter1 = counter(registry);
+        Counter counter1 = counter(registry); // with tags
         counter1.increment();
         counter1.increment();
         counter1.increment();
@@ -71,7 +76,7 @@ public class MicrometerTests {
         System.out.println("Counter 1 : " + counter1.count());
 
         // Type 2 Counter
-        Counter counter2 = registry.counter("counter");
+        Counter counter2 = registry.counter("counter"); // without tags
         counter2.increment();
         counter2.increment();
         counter2.increment();
@@ -97,22 +102,65 @@ public class MicrometerTests {
         System.out.println("Gauge 2 : " + gauge2.value());
 
         // registry.summary("summary").record(10);
+
+        System.out.println("Registry : " + registry.getMetersAsString());
     }
 
     public static void compositeRegistry() {
-        CompositeMeterRegistry composite = new CompositeMeterRegistry();
-
-        Counter compositeCounter = composite.counter("counter");
+        CompositeMeterRegistry compositeRegistry = new CompositeMeterRegistry();
+        Counter compositeCounter = compositeRegistry.counter("compositeCounter");
+        compositeCounter.increment();
         compositeCounter.increment();
 
-        SimpleMeterRegistry simple = new SimpleMeterRegistry();
-        composite.add(simple);
+        SimpleMeterRegistry simpleRegistry = new SimpleMeterRegistry();
+        Counter simpleCounter = simpleRegistry.counter("simpleCounter");
+        simpleCounter.increment();
+        System.out.println("Counter : " + simpleCounter.count()); // = 1.0
+
+        compositeRegistry.add(simpleRegistry);
 
         compositeCounter.increment();
+        compositeCounter.increment();
+        System.out.println("Counter : " + compositeCounter.count()); // = 2.0
+
+        Set<MeterRegistry> registries = compositeRegistry.getRegistries();
+        registries.forEach(registry -> {
+            registry.getMeters().forEach(meter -> {
+                String registryClassName = registry.getClass().getName();
+                String meterClassName = meter.getClass().getName();
+                System.out.println(registryClassName + " : " + meterClassName + " : " + meter.getId() + " : " + meter.measure());
+            });
+        });
     }
 
     public static void globalRegistry() {
+        Counter counter = Metrics.globalRegistry.counter("globalCounter");
+        counter.increment();
 
+        System.out.println("Counter : " + counter.count()); // = 0.0
+
+        SimpleMeterRegistry simpleRegistry = new SimpleMeterRegistry();
+        Counter simpleCounter = simpleRegistry.counter("simpleCounter");
+        simpleCounter.increment();
+        System.out.println("Counter : " + simpleCounter.count()); // = 1.0
+
+        Metrics.addRegistry(simpleRegistry);
+    }
+
+    public static void prometheusMeterRegistry() {
+        PrometheusMeterRegistry registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+        Counter counter = Counter
+                .builder("http.rest.api")
+                .baseUnit("requests")
+                .description("HTTP Request Total Count")
+                .tags("instance", "api.datalake.net", "uri", "/api/v1/user")
+                .register(registry);
+
+        counter.increment();
+        counter.increment();
+
+        System.out.println(registry.scrape());
     }
 
     static class MyClass {
