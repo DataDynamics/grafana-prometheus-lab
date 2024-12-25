@@ -9,6 +9,9 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MicrometerTests {
@@ -26,7 +29,7 @@ public class MicrometerTests {
     FunctionTimer functionTimer;
     TimeGauge timeGauge;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 //        simpleRegistry();
 //        compositeRegistry();
 //        globalRegistry();
@@ -34,7 +37,8 @@ public class MicrometerTests {
 //        counter();
 //        gauge();
 //        timer();
-        distributionSummary();
+//        distributionSummary();
+        longTaskTimer();
     }
 
     /////////////////////////////////////////////////
@@ -247,10 +251,56 @@ public class MicrometerTests {
         System.out.println(registry.scrape());
     }
 
+    public static void longTaskTimer() throws InterruptedException {
+        PrometheusMeterRegistry registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+        LongTaskTimer timer = LongTaskTimer
+                .builder("long.task.timer")
+                .description("a description of what this timer does")
+                .serviceLevelObjectives(Duration.ofSeconds(5))
+                .publishPercentileHistogram()
+                .publishPercentiles(0.8, 0.95)
+                .tags("instance", "api.datalake.net")
+                .register(registry);
+
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(16, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1000));
+        for (int i = 0; i < 20; i++) {
+            try {
+                Thread.sleep(RandomUtils.insecure().nextInt(100, 500));
+            } catch (InterruptedException e) {
+            }
+
+            final int idx = i;
+            executor.execute(() -> {
+                LongTaskTimer.Sample sample = timer.start();
+                sleep();
+                String index = String.format("[%s] ", idx);
+                System.out.println(index + "Duration : " + sample.duration(TimeUnit.MILLISECONDS) + "ms");
+                System.out.println(index + "Max time: " + timer.max(TimeUnit.MILLISECONDS) + " ms");
+                System.out.println(index + "Active Tasks : " + timer.activeTasks());
+                System.out.println(index + "\n" + registry.scrape());
+                sample.stop();
+            });
+        }
+
+        // 더 이상 새로운 작업을 받지 않고, 작업 큐에 대기 중인 모든 작업을 처리한 후 종료한다.
+        executor.shutdown();
+        try {
+            // 10초 동안 모든 작업이 완료되길 기다린다.
+            if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                // 10초 동안 모든 작업이 끝나지 않은 경우, 모든 작업을 취소하고 Thread Pool을 강제 종료한다.
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            // InterruptedException 발생 시, 작업 취소하고 Thread Pool을 강제 종료한다.
+            executor.shutdownNow();
+        }
+
+    }
+
     public static void sleep() {
         try {
             int millis = RandomUtils.insecure().nextInt(500, 2000);
-            System.out.println("Sleep : " + millis + "ms");
             Thread.sleep(millis);
         } catch (InterruptedException e) {
         }
