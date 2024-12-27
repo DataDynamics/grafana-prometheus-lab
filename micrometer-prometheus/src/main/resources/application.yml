@@ -35,6 +35,10 @@ spring:
     jdbc:
       initialize-schema: always   # change this value
 
+  zipkin:
+    base-url: http://localhost:9411
+    enabled: true
+
 ##################################
 # SpringDoc OpenAPI Configuration
 ##################################
@@ -62,7 +66,12 @@ app:
   prometheus:
     job-name: spring
     grouping-key: ${spring.application.name}
-    pushgateway-url: localhost:9091
+    push-gateway:
+      url: localhost:9091
+      credentials:
+        enabled: false
+        username: admin
+        password: XnK4tuFhMrAGcbsdkX2G7tf2q8
 
 #############################
 # Logging Configuration
@@ -76,8 +85,6 @@ logging:
 #############################
 
 management:
-  server:
-    port: 9000
   endpoint:
     health:
       show-details: always
@@ -93,3 +100,13 @@ management:
       exposure:
         include: "*"
 #        include: prometheus, metrics, info, health, shutdown, beans
+
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: B3
+      produce: B3_MULTI
+  zipkin:
+    tracing:
+      endpoint: "http://localhost:9411/api/v2/spans"

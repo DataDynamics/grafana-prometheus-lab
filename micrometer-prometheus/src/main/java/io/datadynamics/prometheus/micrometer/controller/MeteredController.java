@@ -19,6 +19,9 @@ import java.util.Map;
 public class MeteredController {
 
     @Autowired
+    TestService testService;
+
+    @Autowired
     MeterRegistry meterRegistry;
 
     Timer timer;
@@ -35,13 +38,13 @@ public class MeteredController {
     }
 
     @GetMapping("/hello/{name}")
-    Map helloworld(@PathVariable("name") String name) {
+    public Map helloworld(@PathVariable("name") String name) {
         Timer.Sample sample = Timer.start(meterRegistry);
 
-        Map map = new HashMap();
-        map.put("message", "Hello " + name);
-
         sleep();
+
+        Map map = new HashMap();
+        map.put("message", "Hello " + testService.getName(name));
 
         sample.stop(timer);
         return map;

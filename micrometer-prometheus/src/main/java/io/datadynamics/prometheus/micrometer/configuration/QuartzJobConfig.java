@@ -1,5 +1,6 @@
 package io.datadynamics.prometheus.micrometer.configuration;
 
+import io.datadynamics.prometheus.micrometer.job.PrometheusJob;
 import jakarta.annotation.PostConstruct;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -19,24 +20,23 @@ public class QuartzJobConfig {
 
     @PostConstruct
     public void postConstruct() throws Exception {
+        scheduler.scheduleJob(jobDetail(), trigger());
     }
 
-/*
-    JobDetail jobDetail() {
-        JobDetail jobDetail = JobBuilder.newJob(CronJob.class)
-                .withIdentity("someJobKey", "immediateEmailsGroup")
+    public JobDetail jobDetail() {
+        JobDetail jobDetail = JobBuilder.newJob(PrometheusJob.class)
+                .withIdentity("prometheus", "pushgateway-job")
                 .storeDurably()
                 .build();
         return jobDetail;
     }
 
-    CronTrigger trigger() {
+    public CronTrigger trigger() {
         CronTrigger trigger = newTrigger()
-                .withIdentity("trigger3", "group1")
+                .withIdentity("pushgateway-jobtrigger", "prometheus")
                 .withSchedule(cronSchedule("0 * * * * ?"))
                 .forJob(jobDetail())
                 .build();
         return trigger;
     }
-*/
 }
