@@ -15,12 +15,6 @@ public class HelloWorldController {
     @Counted("helloworld.sayhello")
     @GetMapping("/sayhello")
     public ResponseEntity sayhello() throws IOException {
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-        }
-
         return ResponseEntity.ok("Hello World");
     }
 }
