@@ -19,9 +19,6 @@ import java.util.Map;
 public class MeteredController {
 
     @Autowired
-    TestService testService;
-
-    @Autowired
     MeterRegistry meterRegistry;
 
     Timer timer;
@@ -44,7 +41,7 @@ public class MeteredController {
         sleep();
 
         Map map = new HashMap();
-        map.put("message", "Hello " + testService.getName(name));
+        map.put("message", "Hello " + name);
 
         sample.stop(timer);
         return map;
